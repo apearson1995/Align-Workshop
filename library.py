@@ -1,13 +1,114 @@
-# Group 6: Distance based tree methods 
-
-# Authors: Josh Nixon
-#          Alex Pearson
-#          Bidit Acharya
-#          Tracy Lou
-
 import numpy as np
-import sys 
 from ete3 import Tree
+from numpy import linalg as LA
+import sys 
+from scipy.io import loadmat
+
+###################################################
+################ Testing Functions ################
+###################################################
+
+def test_prop_diff(func):
+	if func("ATTGAC","ATGGCC") == float(2)/float(6):
+		return "CONGRTULATIONS YOUR FUNCTION IS CORRECT :) !"
+	else:
+		return "You made a mistake, please try again"
+
+###################################################
+################ Jukes Cantor #####################
+###################################################
+
+A = np.array([[5, 3, 2],
+              [1, 4, 5],
+              [6, 7, 8],
+             ])
+
+B = np.array([[5, 3, 9],
+              [3, 4, 1],
+              [6, 7, 8],
+             ])
+
+################################################
+"""
+Constructs a Jukes Cantor transition Matrix with a specified alpha level a
+Args:
+     a: alpha level for the Jukes Cantor Matrix
+Returns:
+     Transition Matrix corresponding to the Jukes-Cantor Algorithm
+"""
+
+def JC_matrix(a):
+
+    """
+    >>> np.trace(JC_matrix(.25))
+    3.0
+    """
+
+    b = a/3
+    M = np.array([[1-a, b, b, b],
+                 [b, 1-a, b, b],
+                 [b, b, 1-a, b],
+                 [b, b, b, 1-a]])
+    return M
+
+
+"""
+Computes proportion of differing letters from two strings of the same size
+Args:
+    s1: string 1
+    s2: string 2 
+Returns:
+    Throws error if the strings are not of the same length
+    Else, returns proportion (in between 0 and 1) of differing letters
+"""
+
+def prop_diff(s1,s2):
+    # """ LOOK curious as to why this isn't working
+    # >>> prop_diff("ATTGAC","ATGGCC") 
+    # float(2)/float(6)  
+    # """
+    if len(s1) != len(s2):
+        raise ValueError("Cannot compute compare DNA sequences of differing length")
+    diffs = 0
+    i     = 0
+    while i < len(s1):
+        if s1[i] != s2[i]:
+            diffs += 1
+        i += 1
+    return float(diffs)/float(len(s1))
+
+"""
+Computes the JC distance between two sequences.
+Args:
+    s1: string 1
+    s2: string 2 
+Returns:
+    Throws error if the strings are not of the same length
+    Else, computes JC distance
+"""
+
+def JC_distance(s1,s2):
+    prop_diffs = prop_diff(s1,s2)
+    return 1 - (np.log(1 - 4/3*prop_diffs))
+
+"""
+Returns JC Matrix give sequences
+"""
+
+def JC_matrix_maker(seqs):
+  M = np.zeros((len(seqs),len(seqs)))
+  for i in xrange(len(seqs) - 1):
+    s1 = seqs[i]
+    for j in xrange(i, len(seqs)):
+      s2 = seqs[j]
+      M[i][j] = JC_distance(s1,s2)
+  return M
+
+
+
+###################################################
+################ Neighbhor Joining  ###############
+###################################################
 
 """
 Computes a list whose ith entry is the distance from taxa i to all of the other taxa in the distance matrix
@@ -208,6 +309,68 @@ def neighbor_based_method(M, names, closest_neighbors_fn, new_dist_fn, parent_di
     return trees[0]
 
 """
+Constructs a Jukes Cantor transition Matrix with a specified alpha level a
+Args:
+     a: alpha level for the Jukes Cantor Matrix
+Returns:
+     Transition Matrix corresponding to the Jukes-Cantor Algorithm
+"""
+
+def JC_matrix(a):
+
+    """
+    >>> np.trace(JC_matrix(.25))
+    3.0
+    """
+
+    b = a/3
+    M = np.array([[1-a, b, b, b],
+                 [b, 1-a, b, b],
+                 [b, b, 1-a, b],
+                 [b, b, b, 1-a]])
+    return M
+
+
+"""
+Computes proportion of differing letters from two strings of the same size
+Args:
+    s1: string 1 or tokenized list
+    s2: string 2 or tokenized list
+Returns:
+    Throws error if the strings are not of the same length
+    Else, returns proportion (in between 0 and 1) of differing letters
+"""
+
+def prop_diff(s1,s2):
+    # """ LOOK curious as to why this isn't working
+    # >>> prop_diff("ATTGAC","ATGGCC") 
+    # float(2)/float(6)  
+    # """
+    if len(s1) != len(s2):
+        raise ValueError("Cannot compute compare DNA sequences of differing length")
+    diffs = 0
+    i     = 0
+    while i < len(s1):
+        if s1[i] != s2[i]:
+            diffs += 1
+        i += 1
+    return float(diffs)/float(len(s1))
+
+"""
+Computes the JC distance between two sequences.
+Args:
+    s1: string 1
+    s2: string 2 
+Returns:
+    Throws error if the strings are not of the same length
+    Else, computes JC distance
+"""
+
+def JC_distance(s1,s2):
+    prop_diff = prop_diff(s1,s2)
+    return 1 - (np.log(1 - 4/3*prop_diff))
+
+"""
 Runs the UPGMA algorithm by calling neighbhor_based_method thus outputting a tree
 Args:
     M:     the old distance matrix
@@ -231,12 +394,59 @@ def neighbor_joining(M, names):
     return neighbor_based_method(M, names, lambda m : closest_neighbors(make_Q_matrix(m)), neighbor_joining_new_dist, neighbor_joining_parent_dist)
 
 
+##################
 
 
 
 
+from jukes_cantor import *
+from distance_based_trees import *
+from mutate import *
 
 
+hiv_data = loadmat('flhivdata.mat')
+
+print(hiv_data.keys())
+
+dnt    = hiv_data["dnt"][0]
+
+ctrl_1 = hiv_data["lc1"][0]
+ctrl_5 = hiv_data["lc5"][0]
+
+ptb    = hiv_data["ptb"][0]
+ptc	   = hiv_data["ptc"][0]
+ptd    = hiv_data["ptd"][0]
+
+min_len = min(len(dnt),len(ctrl_1),len(ctrl_5),len(ptb),len(ptc),len(ptd))
+print(min_len)
+
+def chop(seq):
+	ans    = min_len*["o"]
+	tokens = list(seq)
+	for i in xrange(min_len):
+		ans[i] = tokens[i]
+	return ''.join(ans)
+
+dnt    = chop(dnt)
+ctrl_1 = chop(ctrl_1)
+ctrl_5 = chop(ctrl_5)
+
+ptb    = chop(ptb)
+ptc	   = chop(ptc)
+ptd    = chop(ptd)
+
+names = ["dnt", "ptb", "ptc", "ptd", "ctrl1", "ctrl5"]
+seqs  = [dnt, ptb, ptc, ptd, ctrl_1, ctrl_5]
+
+M = JC_matrix_maker(seqs)
+
+UPGMA(M, names)
+
+names = ["dnt", "ptb", "ptc", "ptd", "ctrl1", "ctrl5"]
+seqs  = [dnt, ptb, ptc, ptd, ctrl_1, ctrl_5]
+M = JC_matrix_maker(seqs)
+tree = neighbor_joining(M, names)
+names = ["dnt", "ptb", "ptc", "ptd", "ctrl1", "ctrl5"]
 
 
 
