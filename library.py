@@ -83,8 +83,7 @@ Args:
     s1: string 1
     s2: string 2 
 Returns:
-    Throws error if the strings are not of the same length
-    Else, computes JC distance
+	computes JC distance
 """
 
 def JC_distance(s1,s2):
@@ -367,8 +366,8 @@ Returns:
 """
 
 def JC_distance(s1,s2):
-    prop_diff = prop_diff(s1,s2)
-    return 1 - (np.log(1 - 4/3*prop_diff))
+    prop_diffs = prop_diff(s1,s2)
+    return 1 - (np.log(1 - 4/3*prop_diffs))
 
 """
 Runs the UPGMA algorithm by calling neighbhor_based_method thus outputting a tree
@@ -395,13 +394,6 @@ def neighbor_joining(M, names):
 
 
 ##################
-
-
-
-
-from jukes_cantor import *
-from distance_based_trees import *
-from mutate import *
 
 
 hiv_data = loadmat('flhivdata.mat')
@@ -440,7 +432,8 @@ seqs  = [dnt, ptb, ptc, ptd, ctrl_1, ctrl_5]
 
 M = JC_matrix_maker(seqs)
 
-UPGMA(M, names)
+a = UPGMA(M, names)
+a.show()
 
 names = ["dnt", "ptb", "ptc", "ptd", "ctrl1", "ctrl5"]
 seqs  = [dnt, ptb, ptc, ptd, ctrl_1, ctrl_5]
