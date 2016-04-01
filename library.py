@@ -46,6 +46,46 @@ def prop_diff(s1,s2):
     return float(diffs)/float(len(s1))
 
 """
+Compute proportion of transversions from two strings of the same length. 
+
+Transversions are (A<->C, A<->T, C<->G, G<->T).
+
+Args: 
+    s1: string 1
+    s2: string 2
+
+Return:
+    Error if the strings are not of same length
+    Else, return a and b of different letters
+"""
+def prop_trv(s1,s2):
+    if len(s1) != len(s2):
+        raise ValueError("Cannot compute compare DNA sequences of differing length")
+    diffs = 0
+    i     = 0
+    while i < len(s1):
+        if s1[i] == "A" and s2[i] == "C":
+            diffs += 1
+        elif s1[i] == "C" and s2[i] == "A":
+            diffs += 1
+        elif s1[i] == "A" and s2[i] == "T":
+            diffs += 1
+        elif s1[i] == "T" and s2[i] == "A":
+            diffs += 1
+        elif s1[i] == "C" and s2[i] == "G":
+            diffs += 1
+        elif s1[i] == "G" and s2[i] == "C":
+            diffs += 1
+        elif s1[i] == "G" and s2[i] == "T":
+            diffs += 1
+        elif s1[i] == "T" and s2[i] == "G":
+            diffs += 1
+        i += 1
+    return float(diffs)/float(len(s1))
+
+    
+
+"""
 Computes the JC distance between two sequences.
 Args:
     s1: string 1
