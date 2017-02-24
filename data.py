@@ -23,7 +23,7 @@ min_len = min(len(dnt),len(ctrl_1),len(ctrl_5),len(ptb),len(ptc),len(ptd))
 def chop(seq):
     ans    = min_len*["o"]
     tokens = list(seq)
-    for i in xrange(min_len):
+    for i in np.arange(min_len):
         ans[i] = tokens[i]
     return ''.join(ans)
 

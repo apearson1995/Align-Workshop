@@ -104,9 +104,9 @@ Returns JC Matrix give sequences
 
 def JC_matrix_maker(seqs):
   M = np.zeros((len(seqs),len(seqs)))
-  for i in xrange(len(seqs) - 1):
+  for i in np.arange(len(seqs) - 1):
     s1 = seqs[i]
-    for j in xrange(i+1, len(seqs)):
+    for j in np.arange(i+1, len(seqs)):
       s2 = seqs[j]
       M[i][j] = JC_distance(s1,s2)
   return M
